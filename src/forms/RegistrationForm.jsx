@@ -1,0 +1,143 @@
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import Field from "../componenets/Field";
+import FieldSet from "../componenets/FieldSet";
+import NumberInput from "../componenets/NumberInput";
+
+
+export default function RegistrationForm() {
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setError,
+        control
+
+    } = useForm();
+
+    const { fields, append, remove } = useFieldArray({
+        name: "socials",
+        control
+    });
+    const submitForm = (formData) => {
+        console.log(formData)
+    }
+    return (
+        <div className="flex flex-col justify-center items-center">
+            <form onSubmit={handleSubmit(submitForm)}>
+                <FieldSet label="Enter Register Basic Details">
+                <Field label="Picture" error={errors.picture}>
+                        <input
+                            {...register("picture", {
+                                required: "Picture is required",
+                            })}
+                            type="file"
+                            id="picture"
+                            name="picture"
+                        />
+                    </Field>
+                    <Field label="Email" error={errors.email}>
+                        <input
+
+                            {...register("email", { required: "Email is required" })}
+                            className={`p-2 border box-border w-[300px] rounded-md ${errors.email ? "border-red-500" : "border-gray-200"}`}
+                            type="email"
+                            name="email"
+                            id="email"
+                            placeholder="Enter your email address"
+                        />
+                    </Field>
+                    <Field label="Password" error={errors.password}>
+                        <input
+
+                            {...register("password", { required: "Password is required", minLength: { value: 8, message: "Your Password must be at least 8 characters" } })}
+                            className={`p-2 border box-border w-[300px] rounded-md ${errors.password ? "border-red-500" : "border-gray-200"}`}
+                            type="password"
+                            name="password"
+                            id="password"
+                            placeholder="Enter your Password"
+                        />
+                    </Field>
+                    <Field label="Full Name" error={errors.fname}>
+                        <input
+
+                            {...register("fname", { required: "Full Name is required" })}
+                            className={`p-2 border box-border w-[300px] rounded-md ${errors.fname ? "border-red-500" : "border-gray-200"}`}
+                            type="text"
+                            name="fname"
+                            id="fname"
+                            placeholder="Enter your Full Name"
+                        />
+                    </Field>
+                    <Field label="Age" error={errors.age}>
+                        <Controller
+                            name="age"
+                            control={control}
+                            defaultValue={1}
+                            render={({ field: { ref, ...field } }) => (
+                                <NumberInput
+                                    id="age"
+                                    className={`p-2 border box-border w-full rounded-md ${
+                                        !!errors.age
+                                            ? "border-red-500"
+                                            : "border-gray-200"
+                                    }`}
+                                    {...field}
+                                />
+                            )}
+                            rules={{
+                                max: {
+                                    value: 100,
+                                    message: "Age can be between 0 and 100",
+                                },
+                            }}
+                        />
+                    </Field>
+                </FieldSet>
+                <FieldSet label="Enter Register Social Handles">
+                    {
+                        fields.map((field, index) => {
+                            return (
+                                <div key={field.id} className="flex justify-between items-center w-max">
+                                    <Field label="Social Name">
+                                        <input
+
+                                            {...register(`socials[${index}].name`)}
+                                            className={`p-2 border box-border w-[300px] rounded-md`}
+                                            type="text"
+                                            name={`socials[${index}].name`}
+                                            id={`socials[${index}].name`}
+
+                                        />
+                                    </Field>
+                                    <Field label="Social URL">
+                                        <input
+
+                                            {...register(`socials[${index}].url`)}
+                                            className={`p-2 border box-border w-[300px] rounded-md `}
+                                            type="text"
+                                            name={`socials[${index}].url`}
+                                            id={`socials[${index}].url`}
+
+                                        />
+                                    </Field>
+                                    <button onClick={() => remove(index)} className="mt-8 mr-2 text-2xl">
+                                        &#8722;
+                                    </button>
+                                </div>
+                            )
+                        })
+                    }
+                    <button onClick={() => append({ name: "", url: "" })} className="mt-8 text-md text-white cursor-pointer border rounded-lg bg-gray-500 p-1 m-auto">
+                        Add A Social Handle
+                    </button>
+                </FieldSet>
+                <div>
+                    {errors?.root?.random?.message}
+                </div>
+                <Field >
+                    <button className="text-md text-white cursor-pointer p-1 border rounded-lg bg-purple-500 mx-auto ">Register</button>
+                </Field>
+            </form>
+        </div>
+    );
+}
